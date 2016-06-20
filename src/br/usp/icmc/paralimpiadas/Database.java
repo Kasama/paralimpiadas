@@ -13,10 +13,10 @@ public class Database {
     private Properties props;
     private Connection conn;
 
-    public Database(String properiesFileName)
+    public Database(String propertiesFileName)
             throws IOException, ClassNotFoundException, SQLException {
         props = new Properties();
-        props.load(new FileReader(properiesFileName));
+        props.load(new FileReader(propertiesFileName));
         Class.forName(props.getProperty("driver"));
         String driver = buildDriver(props);
         conn = DriverManager.getConnection(driver, props);
@@ -42,6 +42,7 @@ public class Database {
             return null;
         }
     }
+
     public boolean execute(String sql){
         try {
             return conn.createStatement().execute(sql);
