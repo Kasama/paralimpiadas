@@ -1,6 +1,8 @@
 package br.usp.icmc.paralimpiadas;
 
+import br.usp.icmc.paralimpiadas.database.Local;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,28 +19,34 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
+        Parent root = loader.load();
+        primaryStage.setTitle("Jogos Paralímpicos - Main");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.setHeight(270);
+        primaryStage.setWidth(500);
         primaryStage.show();
-    }
+        // Updates a text field to have your external IP address, so its easier
+        // for you to tell someone to connect to you
+        loader.<MainController>getController().setup();
+        // Set the platform to exit when the window is closed
+        primaryStage.setOnCloseRequest(event -> Platform.exit());
 
+    }
 
     public static void main(String[] args) {
         try {
-            Class.forName("org.postgresql.Driver");
             Properties props = new Properties();
             props.load(new FileReader("database.properties"));
+            Class.forName(props.getProperty("driver"));
             String driver = buildDriver(props);
             Connection conn = DriverManager.getConnection(driver, props);
             Statement stm = conn.createStatement();
             String sql = "select * from Local";
             ResultSet rs = stm.executeQuery(sql);
             while(rs.next()){
-                String nome = rs.getString("nome");
-                int cap = rs.getInt("capacidade");
-                String endereco = rs.getString("endereco");
-                System.out.println(nome + " - " + cap + " - " + endereco);
+                Local l = Local.populate(rs);
+                System.out.println(l.getNome() + " - " + l.getCapacidade() + " - " + l.getEndereco());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,16 +54,4 @@ public class Main extends Application {
 //        launch(args);
     }
 
-    private static String buildDriver(Properties props) {
-        StringBuilder str = new StringBuilder();
-        str.append("jdbc:");
-        str.append(props.getProperty("adapter"));
-        str.append("://");
-        str.append(props.getProperty("host"));
-        str.append(":");
-        str.append(props.getProperty("port"));
-        str.append("/");
-        str.append(props.getProperty("database"));
-        return str.toString();
-    }
 }
