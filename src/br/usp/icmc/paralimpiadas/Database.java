@@ -2,10 +2,7 @@ package br.usp.icmc.paralimpiadas;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 
 public class Database {
@@ -34,6 +31,20 @@ public class Database {
         str += (props.getProperty("database"));
         return str;
     }
+
+	public ResultSet executeQuery(String sql, String... args){
+		try {
+			PreparedStatement statement = conn.prepareStatement(sql);
+			int num = sql.split("\\?").length - 1;
+			num = Math.min(num, args.length);
+			for (int i = 1; i <= num; i++){
+				statement.setString(i, args[i-1]);
+			}
+			return statement.executeQuery();
+		} catch (SQLException e) {
+			return null;
+		}
+	}
 
     public ResultSet executeQuery(String sql){
         try {

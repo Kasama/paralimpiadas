@@ -230,3 +230,30 @@ database:
           - Prata >= 0
           - Bronze >= 0
           - Classificacao >= 0
+
+    Atleta:
+      rows:
+        NInscricao: &ATLETA_INSCRICAO number
+        Nome: vchar_80
+        Deficiencia: vchar_200
+        Nascimento: timestamp
+        Genero: vchar_20
+        Pais: *PAIS_SIGLA
+      metadata:
+        PK: NInscricao
+        FK:
+          Pais: Pais
+        Check:
+          - NInscricao >= 0
+    Paricipa:
+      rows:
+        Pais: *PAIS_SIGLA
+        Modalidade: *MODALIDADE_NOME
+        Inscricao: *EQUIPE_INSCRICAO
+        Atleta: *ATLETA_INSCRICAO
+      metadata:
+        PK:
+          - Pais
+          - Modalidade
+          - Inscricao
+          - Atleta
